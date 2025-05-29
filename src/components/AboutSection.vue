@@ -41,8 +41,8 @@ onMounted(() => {
   ctx.scale(dpi, dpi)
 
   let hue = 180
-
   const numParticles = 130
+
   const particles = Array.from({ length: numParticles }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
@@ -50,6 +50,8 @@ onMounted(() => {
     vy: (Math.random() - 0.5) * 1,
     radius: Math.random() * 1.5 + 1
   }))
+
+  const mouse = { x: 0, y: 0, active: false }
 
   const draw = () => {
     ctx.fillStyle = 'rgba(0,0,0,0.2)'
@@ -59,8 +61,28 @@ onMounted(() => {
     const color = `hsl(${hue % 360}, 100%, 60%)`
 
     particles.forEach((p, i) => {
+      // משיכה לעכבר
+      if (mouse.active) {
+        const dx = mouse.x - p.x
+        const dy = mouse.y - p.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const forceRadius = 150
+        if (dist < forceRadius) {
+          const force = (forceRadius - dist) / forceRadius
+          const angle = Math.atan2(dy, dx)
+          const fx = Math.cos(angle) * force * 0.6
+          const fy = Math.sin(angle) * force * 0.6
+          p.vx += fx
+          p.vy += fy
+        }
+      }
+
+      // עדכון מיקום
       p.x += p.vx
       p.y += p.vy
+      p.vx *= 0.98 // חיכוך קל
+      p.vy *= 0.98
+
       if (p.x < 0 || p.x > width) p.vx *= -1
       if (p.y < 0 || p.y > height) p.vy *= -1
 
@@ -72,6 +94,7 @@ onMounted(() => {
       ctx.fill()
       ctx.shadowBlur = 0
 
+      // קווים לחלקיקים אחרים
       for (let j = i + 1; j < particles.length; j++) {
         const q = particles[j]
         const dx = p.x - q.x
@@ -103,9 +126,24 @@ onMounted(() => {
     ctx.scale(dpi, dpi)
   }
 
+  const handleMouseMove = (e: MouseEvent) => {
+    mouse.x = e.clientX
+    mouse.y = e.clientY
+    mouse.active = true
+  }
+
+  const handleMouseLeave = () => {
+    mouse.active = false
+  }
+
   window.addEventListener('resize', handleResize)
+  canvas.addEventListener('mousemove', handleMouseMove)
+  canvas.addEventListener('mouseleave', handleMouseLeave)
+
   onBeforeUnmount(() => {
     window.removeEventListener('resize', handleResize)
+    canvas.removeEventListener('mousemove', handleMouseMove)
+    canvas.removeEventListener('mouseleave', handleMouseLeave)
   })
 })
 </script>
@@ -144,4 +182,5 @@ onMounted(() => {
     border-color: transparent;
   }
 }
+
 </style>
