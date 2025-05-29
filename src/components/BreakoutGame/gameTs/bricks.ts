@@ -1,3 +1,4 @@
+import type { Drop } from './drops'
 import type { Brick } from './techPool'
 
 export function initBricks(
@@ -39,7 +40,7 @@ export function checkBrickCollision(
   ballY: number,
   ballR: number,
   score: { value: number },
-  drops: { text: string; x: number; y: number; category: string }[],
+  drops: Drop[],
   currentColor: string
 ): string {
   for (const b of bricks) {
@@ -50,9 +51,18 @@ export function checkBrickCollision(
       ballY - ballR < b.y + 30 &&
       ballY + ballR > b.y
     ) {
+      const img = new Image()
+      img.src = b.iconUrl
       b.hit = true
       score.value += 10
-      drops.push({ text: b.tech, x: b.x + 30, y: b.y + 30, category: b.category })
+      drops.push({
+        text: b.tech,
+        x: b.x + 30,
+        y: b.y + 30,
+        category: b.category,
+        iconUrl: b.iconUrl, 
+        iconImg: img, 
+      })
       return b.color
     }
   }

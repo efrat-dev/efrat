@@ -2,7 +2,7 @@ import { ref, onMounted } from 'vue'
 import { techPool, type Brick } from '../gameTs/techPool'
 import { initBricks, drawBricks, checkBrickCollision } from '../gameTs/bricks'
 import { drawBall, updateBall } from '../gameTs/ball'
-import { drawDrops } from '../gameTs/drops'
+import { drawDrops, type Drop } from '../gameTs/drops'
 import { techCategories } from '../gameTs/techData'
 
 export function useBreakoutGame() {
@@ -20,7 +20,7 @@ export function useBreakoutGame() {
   }
 
   const bricks: Brick[] = []
-  const drops: { text: string; x: number; y: number; category: string }[] = []
+  const drops: Drop[] = []
   let ballColor = '#ffffff'
 
   onMounted(() => {

@@ -7,6 +7,7 @@ export interface Brick {
   category: string
   hit: boolean
   color: string
+  iconUrl: string
 }
 
 function getRandomColor(): string {
@@ -29,6 +30,7 @@ for (const [category, techs] of Object.entries(techCategories)) {
       y: 0,
       hit: false,
       color: getRandomColor(),
+      iconUrl: tech.iconUrl, // חדש
     })
   }
 }
