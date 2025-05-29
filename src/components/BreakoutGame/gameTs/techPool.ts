@@ -30,7 +30,7 @@ for (const [category, techs] of Object.entries(techCategories)) {
       y: 0,
       hit: false,
       color: getRandomColor(),
-      iconUrl: tech.iconUrl, // חדש
+      iconUrl: tech.iconUrl, 
     })
   }
 }
