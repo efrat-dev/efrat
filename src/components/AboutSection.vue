@@ -5,9 +5,10 @@
     data-aos="fade-up"
   >
     <!-- רקע חלקיקים -->
-    <div class="absolute inset-0 -z-10">
-      <canvas id="particles" class="w-full h-full"></canvas>
-    </div>
+<!-- רקע Matrix-style -->
+<div class="absolute inset-0 -z-10 bg-black">
+  <canvas id="neural" class="w-full h-full"></canvas>
+</div>
 
     <div class="relative z-10 max-w-5xl mx-auto text-center">
       <!-- כותרת עם אפקט הקלדה -->
@@ -28,42 +29,54 @@
 import { onMounted } from 'vue'
 
 onMounted(() => {
-  const canvas = document.getElementById('particles') as HTMLCanvasElement
-  if (!canvas) return
-
+  const canvas = document.getElementById('neural') as HTMLCanvasElement
   const ctx = canvas.getContext('2d')!
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
 
-  const particles: { x: number; y: number; dx: number; dy: number; r: number }[] = []
+  const neurons = Array.from({ length: 100 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 1,
+    vy: (Math.random() - 0.5) * 1
+  }))
 
-  for (let i = 0; i < 100; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      dx: (Math.random() - 0.5) * 1.5,
-      dy: (Math.random() - 0.5) * 1.5,
-      r: Math.random() * 2 + 1
-    })
-  }
-
-  function animate() {
+  function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    for (const p of particles) {
+
+    for (let i = 0; i < neurons.length; i++) {
+      const n = neurons[i]
+      n.x += n.vx
+      n.y += n.vy
+
+      if (n.x < 0 || n.x > canvas.width) n.vx *= -1
+      if (n.y < 0 || n.y > canvas.height) n.vy *= -1
+
       ctx.beginPath()
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
+      ctx.arc(n.x, n.y, 2, 0, Math.PI * 2)
+      ctx.fillStyle = '#00ffff'
       ctx.fill()
-      p.x += p.dx
-      p.y += p.dy
-      if (p.x < 0 || p.x > canvas.width) p.dx *= -1
-      if (p.y < 0 || p.y > canvas.height) p.dy *= -1
+
+      for (let j = i + 1; j < neurons.length; j++) {
+        const m = neurons[j]
+        const dx = n.x - m.x
+        const dy = n.y - m.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < 100) {
+          ctx.strokeStyle = `rgba(0, 255, 255, ${1 - dist / 100})`
+          ctx.beginPath()
+          ctx.moveTo(n.x, n.y)
+          ctx.lineTo(m.x, m.y)
+          ctx.stroke()
+        }
+      }
     }
-    requestAnimationFrame(animate)
+    requestAnimationFrame(draw)
   }
 
-  animate()
+  draw()
 })
+
 </script>
 
 <style scoped>
@@ -103,6 +116,8 @@ onMounted(() => {
     border-color: transparent;
   }
 }
+
+
 </style>
 
        
