@@ -4,10 +4,11 @@
     class="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-gray-900 to-gray-800 text-center px-6 overflow-hidden"
     data-aos="fade-up"
   >
-    <!-- רקע כוכבים Canvas -->
-    <div class="absolute inset-0 -z-10 bg-black">
-      <canvas id="stars" class="w-full h-full block"></canvas>
-    </div>
+    <!-- רקע כוכבים תלת-ממדי -->
+    <ThreeGalaxy />
+    <!-- <MeteorCanvas /> -->
+        <!-- <CrystalParticles /> -->
+
 
     <!-- כותרת עם אפקטים -->
     <h1 class="relative text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-gradient-move mb-4">
@@ -50,101 +51,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from 'vue'
+import ThreeGalaxy from '@/components/three/ThreeGalaxy.vue'
+// import MeteorCanvas from '@/components/three/MeteorCanvas.vue'
+// import CrystalParticles from '@/components/three/CrystalParticles.vue'
 
-onMounted(() => {
-  const canvas = document.getElementById('stars') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')!
-  let width = canvas.width = window.innerWidth
-  let height = canvas.height = window.innerHeight
-
-  let mouseX = 0
-  let mouseY = 0
-
-  const numStars = 300
-  const stars = Array.from({ length: numStars }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    r: Math.random() * 1.5 + 0.5,
-    baseR: 0,
-    vx: (Math.random() - 0.5) * 0.3,
-    vy: (Math.random() - 0.5) * 0.3,
-    twinkle: Math.random() * Math.PI * 2
-  }))
-
-  const update = () => {
-    stars.forEach(star => {
-      star.x += star.vx
-      star.y += star.vy
-      star.twinkle += 0.05
-      star.r = star.baseR + Math.sin(star.twinkle) * 0.5
-
-      // חזור לגבולות המסך
-      if (star.x < 0 || star.x > width) star.vx *= -1
-      if (star.y < 0 || star.y > height) star.vy *= -1
-    })
-  }
-
-  const draw = () => {
-    ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = '#fff'
-    ctx.shadowBlur = 10
-    ctx.shadowColor = '#00ffff'
-
-    stars.forEach(star => {
-      ctx.beginPath()
-      ctx.arc(
-        star.x + (mouseX - width / 2) * 0.002,
-        star.y + (mouseY - height / 2) * 0.002,
-        Math.abs(star.r),
-        0,
-        Math.PI * 2
-      )
-      ctx.fill()
-    })
-  }
-
-  const animate = () => {
-    update()
-    draw()
-    requestAnimationFrame(animate)
-  }
-
-  animate()
-
-  const onResize = () => {
-    width = canvas.width = window.innerWidth
-    height = canvas.height = window.innerHeight
-  }
-
-  const onMouseMove = (e: MouseEvent) => {
-    mouseX = e.clientX
-    mouseY = e.clientY
-  }
-
-  window.addEventListener('resize', onResize)
-  window.addEventListener('mousemove', onMouseMove)
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', onResize)
-    window.removeEventListener('mousemove', onMouseMove)
-  })
-})
 </script>
 
 <style scoped>
-
-@keyframes gradient-move {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
-}
-
-.animate-gradient-move {
-  background-size: 200% 200%;
-  animation: gradient-move 5s ease infinite;
-}
 </style>
