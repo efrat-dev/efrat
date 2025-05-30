@@ -40,6 +40,9 @@ export const techCategories: Record<string, TechDefinition[]> = {
     { name: 'Matplotlib', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/matplotlib/matplotlib-original.svg' },
     { name: 'Scikit-learn', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scikitlearn/scikitlearn-original.svg' },
     { name: 'PyTorch', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg' },
+    { name: 'Seaborn', iconUrl: '' },
+    { name: 'Jupyter', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jupyter/jupyter-original.svg' },
+    { name: 'Hugging Face', iconUrl: 'https://huggingface.co/front/assets/huggingface_logo-noborder.svg' },
   ],
   'Tools & Tech': [
     { name: 'Docker', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
