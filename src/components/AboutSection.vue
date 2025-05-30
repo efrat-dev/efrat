@@ -24,128 +24,128 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount } from "vue";
 
 onMounted(() => {
-  const canvas = document.getElementById('neural') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')!
+  const canvas = document.getElementById("neural") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
 
-  let width = window.innerWidth
-  let height = window.innerHeight
-  const dpi = window.devicePixelRatio || 1
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  const dpi = window.devicePixelRatio || 1;
 
-  canvas.width = width * dpi
-  canvas.height = height * dpi
-  canvas.style.width = width + 'px'
-  canvas.style.height = height + 'px'
-  ctx.scale(dpi, dpi)
+  canvas.width = width * dpi;
+  canvas.height = height * dpi;
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+  ctx.scale(dpi, dpi);
 
-  let hue = 180
-  const numParticles = 130
+  let hue = 180;
+  const numParticles = 130;
 
   const particles = Array.from({ length: numParticles }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
     vx: (Math.random() - 0.5) * 1,
     vy: (Math.random() - 0.5) * 1,
-    radius: Math.random() * 1.5 + 1
-  }))
+    radius: Math.random() * 1.5 + 1,
+  }));
 
-  const mouse = { x: 0, y: 0, active: false }
+  const mouse = { x: 0, y: 0, active: false };
 
   const draw = () => {
-    ctx.fillStyle = 'rgba(0,0,0,0.2)'
-    ctx.fillRect(0, 0, width, height)
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0, 0, width, height);
 
-    hue += 0.3
-    const color = `hsl(${hue % 360}, 100%, 60%)`
+    hue += 0.3;
+    const color = `hsl(${hue % 360}, 100%, 60%)`;
 
     particles.forEach((p, i) => {
       // משיכה לעכבר
       if (mouse.active) {
-        const dx = mouse.x - p.x
-        const dy = mouse.y - p.y
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        const forceRadius = 150
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const forceRadius = 150;
         if (dist < forceRadius) {
-          const force = (forceRadius - dist) / forceRadius
-          const angle = Math.atan2(dy, dx)
-          const fx = Math.cos(angle) * force * 0.6
-          const fy = Math.sin(angle) * force * 0.6
-          p.vx += fx
-          p.vy += fy
+          const force = (forceRadius - dist) / forceRadius;
+          const angle = Math.atan2(dy, dx);
+          const fx = Math.cos(angle) * force * 0.6;
+          const fy = Math.sin(angle) * force * 0.6;
+          p.vx += fx;
+          p.vy += fy;
         }
       }
 
       // עדכון מיקום
-      p.x += p.vx
-      p.y += p.vy
-      p.vx *= 0.98 // חיכוך קל
-      p.vy *= 0.98
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.98; // חיכוך קל
+      p.vy *= 0.98;
 
-      if (p.x < 0 || p.x > width) p.vx *= -1
-      if (p.y < 0 || p.y > height) p.vy *= -1
+      if (p.x < 0 || p.x > width) p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
 
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-      ctx.fillStyle = color
-      ctx.shadowBlur = 10
-      ctx.shadowColor = color
-      ctx.fill()
-      ctx.shadowBlur = 0
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = color;
+      ctx.fill();
+      ctx.shadowBlur = 0;
 
       // קווים לחלקיקים אחרים
       for (let j = i + 1; j < particles.length; j++) {
-        const q = particles[j]
-        const dx = p.x - q.x
-        const dy = p.y - q.y
-        const dist = Math.sqrt(dx * dx + dy * dy)
+        const q = particles[j];
+        const dx = p.x - q.x;
+        const dy = p.y - q.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 100) {
-          ctx.strokeStyle = `rgba(255,255,255,${1 - dist / 100})`
-          ctx.lineWidth = 0.5
-          ctx.beginPath()
-          ctx.moveTo(p.x, p.y)
-          ctx.lineTo(q.x, q.y)
-          ctx.stroke()
+          ctx.strokeStyle = `rgba(255,255,255,${1 - dist / 100})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
         }
       }
-    })
+    });
 
-    requestAnimationFrame(draw)
-  }
+    requestAnimationFrame(draw);
+  };
 
-  draw()
+  draw();
 
   const handleResize = () => {
-    width = window.innerWidth
-    height = window.innerHeight
-    canvas.width = width * dpi
-    canvas.height = height * dpi
-    canvas.style.width = width + 'px'
-    canvas.style.height = height + 'px'
-    ctx.scale(dpi, dpi)
-  }
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpi;
+    canvas.height = height * dpi;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.scale(dpi, dpi);
+  };
 
   const handleMouseMove = (e: MouseEvent) => {
-    mouse.x = e.clientX
-    mouse.y = e.clientY
-    mouse.active = true
-  }
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.active = true;
+  };
 
   const handleMouseLeave = () => {
-    mouse.active = false
-  }
+    mouse.active = false;
+  };
 
-  window.addEventListener('resize', handleResize)
-  canvas.addEventListener('mousemove', handleMouseMove)
-  canvas.addEventListener('mouseleave', handleMouseLeave)
+  window.addEventListener("resize", handleResize);
+  canvas.addEventListener("mousemove", handleMouseMove);
+  canvas.addEventListener("mouseleave", handleMouseLeave);
 
   onBeforeUnmount(() => {
-    window.removeEventListener('resize', handleResize)
-    canvas.removeEventListener('mousemove', handleMouseMove)
-    canvas.removeEventListener('mouseleave', handleMouseLeave)
-  })
-})
+    window.removeEventListener("resize", handleResize);
+    canvas.removeEventListener("mousemove", handleMouseMove);
+    canvas.removeEventListener("mouseleave", handleMouseLeave);
+  });
+});
 </script>
 
 <style scoped>
@@ -182,5 +182,4 @@ onMounted(() => {
     border-color: transparent;
   }
 }
-
 </style>

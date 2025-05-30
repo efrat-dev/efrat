@@ -62,8 +62,21 @@ export function useBreakoutGame() {
       categorizedTechs.value[category] = techDefs.map(t => t.name)
     } 
 
+    function drawDynamicBackground(ctx: CanvasRenderingContext2D, ballY: number, canvasHeight: number) {
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight)
+      const shift = Math.sin(ballY / 50) * 50
+    
+      gradient.addColorStop(0, `hsl(${(ballY + shift) % 360}, 70%, 25%)`)
+      gradient.addColorStop(1, `hsl(${(ballY + shift + 180) % 360}, 70%, 15%)`)
+    
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    }
+    
+
    function draw() {
-      ctx.clearRect(0, 0, cw, ch)
+    drawDynamicBackground(ctx, ballY, ch) // רקע חי ודינמי
+
 
       drawBricks(ctx, bricks, brickWidth, brickHeight)
       if (bricks.every((b) => b.hit)) {
