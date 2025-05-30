@@ -1,18 +1,14 @@
 <template>
   <section
     id="hero"
-    class="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-gray-900 to-gray-800 text-center px-6 overflow-hidden"
+    class="relative min-h-screen flex flex-col justify-center items-center text-center px-6 overflow-hidden bg-black"
     data-aos="fade-up"
   >
-    <!-- רקע כוכבים תלת-ממדי -->
-    <ThreeGalaxy />
-    <!-- <MeteorCanvas /> -->
-        <!-- <CrystalParticles /> -->
+    <!-- סצנת Three.js -->
+    <div ref="container" class="absolute inset-0 -z-10"></div>
 
-
-    <!-- כותרת עם אפקטים -->
+    <!-- תוכן עליון -->
     <h1 class="relative text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-gradient-move mb-4">
-      <span class="absolute inset-0 rounded-lg border-4 border-blue-500 opacity-25 animate-pulse"></span>
       EFRAT BDIL
     </h1>
 
@@ -23,7 +19,7 @@
       I build software that combines logic and creativity to deliver real-world solutions.
     </p>
 
-    <!-- כפתורי קישורים -->
+    <!-- קישורים -->
     <div class="mt-10 flex flex-wrap justify-center gap-4 text-sm z-10">
       <a href="mailto:efrat.developer@gmail.com"
          class="relative px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl">
@@ -34,28 +30,94 @@
       <a href="#" class="text-blue-400 underline">GitHub</a>
       <a href="#" class="text-blue-400 underline">Technical Blog</a>
     </div>
-
-    <!-- גל SVG תחתון -->
-    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] -z-10">
-      <svg class="relative block w-[calc(150%+1.3px)] h-[150px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <path d="M0,0 C300,100 900,0 1200,100 L1200,120 L0,120 Z" fill="url(#grad)" opacity="0.1"></path>
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#00f0ff" />
-            <stop offset="100%" stop-color="#8f00ff" />
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
   </section>
 </template>
 
 <script lang="ts" setup>
-import ThreeGalaxy from '@/components/three/ThreeGalaxy.vue'
-// import MeteorCanvas from '@/components/three/MeteorCanvas.vue'
-// import CrystalParticles from '@/components/three/CrystalParticles.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+const container = ref<HTMLDivElement | null>(null)
+
+onMounted(() => {
+  if (!container.value) return
+
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x000000)
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
+  camera.position.set(0, 1.5, 4)
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setPixelRatio(window.devicePixelRatio)
+  container.value.appendChild(renderer.domElement)
+
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.target.set(0, 1, 0)
+  controls.update()
+
+  const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5)
+  scene.add(light)
+
+  const loader = new GLTFLoader()
+  let mixer: THREE.AnimationMixer
+
+loader.load(
+  'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb',
+  (gltf) => {
+    const model = gltf.scene
+
+    // פתרון 1: מיקום נמוך יותר וסקייל מתאים
+    model.position.set(0, -1, 0) // הנמכה של הדגם
+    model.scale.set(1.2, 1.2, 1.2) // הגדלה קלה
+
+    scene.add(model)
+
+    // אנימציות
+    mixer = new THREE.AnimationMixer(model)
+    gltf.animations.forEach((clip) => mixer.clipAction(clip).play())
+  }
+)
+
+  const clock = new THREE.Clock()
+
+  const animate = () => {
+    requestAnimationFrame(animate)
+    const delta = clock.getDelta()
+    if (mixer) mixer.update(delta)
+    renderer.render(scene, camera)
+  }
+
+  animate()
+
+  const onResize = () => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
+
+  window.addEventListener('resize', onResize)
+  onUnmounted(() => {
+    window.removeEventListener('resize', onResize)
+    renderer.dispose()
+  })
+})
 </script>
 
 <style scoped>
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+.animate-gradient-move {
+  background-size: 200% 200%;
+  animation: gradient-move 5s ease infinite;
+}
 </style>
